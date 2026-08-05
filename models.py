@@ -26,3 +26,8 @@ class ReviewRead(SQLModel):
     rating: int
     comment: str
     created_at: datetime
+
+
+class ReviewUpdate(SQLModel):
+    rating: Optional[int] = Field(default=None, ge=1, le=5)  # noqa: UP045
+    comment: Optional[str] = None  # noqa: UP045
