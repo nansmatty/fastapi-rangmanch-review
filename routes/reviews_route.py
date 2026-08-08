@@ -52,7 +52,25 @@ def get_average_rating(play_name: str, session: Session = Depends(get_session)):
 
 
 @router.get("/{review_id}", response_model=ReviewRead)
-def get_review(review_id = int, session: Session = Depends(get_session)):  # noqa: B008
+def get_review(review_id: int, session: Session = Depends(get_session)):  # noqa: B008
     review = session.get(Review, review_id)
     if not review:
         raise HTTPException(404, "Review not found.")
+    return review
+
+
+@router.patch("/{review_id}", response_model=ReviewRead)
+def update_review(review_id: int, update: ReviewUpdate, session: Session = Depends(get_session)):  # noqa: B008
+    review = session.get(Review, review_id)
+    if not review:
+        raise HTTPException(404, "Review not found.")
+
+    update_data = update.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(review, key, value)
+
+    session.add(review)
+    session.commit()
+    session.refresh(review)
+    return review
