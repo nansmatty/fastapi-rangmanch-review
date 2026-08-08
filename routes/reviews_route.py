@@ -1,3 +1,5 @@
+from curses.ascii import HT
+
 from fastapi import APIRouter, Depends, HTTPException, Query  # noqa: I001
 from sqlmodel import Session, func, select
 from database import get_session
@@ -49,3 +51,8 @@ def get_average_rating(play_name: str, session: Session = Depends(get_session)):
     }
 
 
+@router.get("/{review_id}", response_model=ReviewRead)
+def get_review(review_id = int, session: Session = Depends(get_session)):  # noqa: B008
+    review = session.get(Review, review_id)
+    if not review:
+        raise HTTPException(404, "Review not found.")
