@@ -1,5 +1,3 @@
-from curses.ascii import HT
-
 from fastapi import APIRouter, Depends, HTTPException, Query  # noqa: I001
 from sqlmodel import Session, func, select
 from database import get_session
