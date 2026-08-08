@@ -29,3 +29,23 @@ def list_reviews(play_name: str | None = Query(None, description="Filter by play
     reviews = session.exec(query).all()
     return reviews
 
+@router.get("/average/{play_name}")
+def get_average_rating(play_name: str, session: Session = Depends(get_session)): # noqa: B008
+    result = session.exec( 
+        select(func.avg(Review.rating), func.count(Review.id)).where(Review.play_name == play_name)).first() # pyright: ignore[reportArgumentType]
+    
+    if result is None:
+        raise HTTPException(404, f"No review found for {play_name}")
+
+    avg_rating, total_reviews = result
+
+    if total_reviews == 0:
+        raise HTTPException(404, f"No review found for {play_name}")
+
+    return {
+        "play_name": play_name,
+        "average_rating": round(avg_rating, 2),
+        "total_reviews": total_reviews
+    }
+
+
